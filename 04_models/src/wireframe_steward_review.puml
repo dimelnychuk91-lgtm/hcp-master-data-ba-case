@@ -1,0 +1,30 @@
+@startsalt wireframe_steward_review
+title Wireframe: Steward Review Queue, Candidate Pair
+{+
+  {/ Queue DE (42 open, 3 older than 5 days) | <b>Pair DE-2027-00481 | Merge history }
+  ==
+  { <b>Model score: 0.88 (review band) | . | <b>Open-cycle payments: yes, sent to review by rule R6 }
+  ..
+  {#
+    <b>Attribute | <b>Record A: PharmaCo CRM | <b>Record B: Events | <b>Match
+    First name | Thomas | Tomas | similar
+    Last name | Becker | Becker | same
+    Specialty | Oncology | Oncology | same
+    Address | Ringstr. 12, Köln | Ringstrasse 12, Köln | same after standardisation
+    Affiliation | Example University Hospital | Example University Hospital | same
+    Reference ID | DE-55120931 | (missing) | n/a
+    Payments in open cycle | 2 (EUR 1,450) | 1 (EUR 300) | .
+  }
+  ..
+  <b>Top reasons from model: same address, same affiliation, similar first name
+  ..
+  {
+    Decision | (X) Same doctor | ( ) Different doctors
+    Reason   | ^same address and name^
+    Comment  | "                                   "
+  }
+  { [Save decision] | [Skip] | [Open both source records] }
+  ..
+  <i>Saved decisions are logged and used as training labels for the matching model.
+}
+@endsalt

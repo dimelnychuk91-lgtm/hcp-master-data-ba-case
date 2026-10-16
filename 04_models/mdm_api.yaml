@@ -1,0 +1,496 @@
+openapi: 3.0.3
+info:
+  title: HCP Master Data API
+  version: 1.0.0
+  description: |
+    Requirements-level API contract for the HCP master data hub (fictional case).
+    Covers the three operations the CRMs need for search before create (BR-04, US-01 to US-03).
+    Written by the BA to agree behaviour with the MDM and CRM teams; the vendor implementation may differ in details.
+
+    Rules enforced by the API:
+    - A doctor cannot be created without a recent candidate search (searchId).
+    - A US doctor requires a valid NPI (BR-03).
+    - The same NPI never creates a second doctor (409).
+    - Retries with the same Idempotency-Key never create duplicates.
+servers:
+  - url: https://mdm.example.com/api/v1
+    description: Example only
+
+security:
+  - oauth2: []
+
+tags:
+  - name: Search
+  - name: HCP
+
+paths:
+  /hcp-candidates/search:
+    post:
+      tags: [Search]
+      summary: Find existing doctors that may match the entered details
+      description: |
+        Called by the CRM before the create form can be saved.
+        Returns up to 10 candidates ranked by score, an exact NPI match always first.
+        Target response time: 2 seconds for 95% of calls (NFR-04).
+      operationId: searchCandidates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CandidateSearchRequest'
+            example:
+              firstName: Anna
+              lastName: Mueller
+              countryCode: DE
+              city: Köln
+              postalCode: "50667"
+              specialtyCode: ONC
+              sourceSystem: PHARMACO_CRM
+      responses:
+        '200':
+          description: Search completed. The list may be empty.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidateSearchResponse'
+              example:
+                searchId: srch_7f3a91
+                expiresAt: '2027-04-12T10:15:00Z'
+                candidates:
+                  - hcpId: HCP000184522
+                    firstName: Anna
+                    lastName: Müller
+                    specialtyCode: ONC
+                    city: Köln
+                    score: 0.962
+                    matchReasons: [SIMILAR_NAME, SAME_POSTAL_CODE, SAME_SPECIALTY]
+                    alsoEngagedBy: BIOCO_FIELD_FORCE
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /hcps:
+    post:
+      tags: [HCP]
+      summary: Create a new doctor after a search found no match
+      description: |
+        Requires the searchId of a search made in the last 30 minutes for the same details.
+        After creation the record is matched asynchronously (rules R1 to R8).
+      operationId: createHcp
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HcpCreateRequest'
+            example:
+              searchId: srch_7f3a91
+              sourceSystem: BIOCO_CRM
+              sourceKey: BC-00981233
+              firstName: James
+              lastName: O'Connor
+              countryCode: US
+              npi: '1234567893'
+              specialtyCode: ONC
+              address:
+                line1: 200 Main Street
+                city: Boston
+                postalCode: '02115'
+                countryCode: US
+      responses:
+        '201':
+          description: Doctor created. Matching runs in the background.
+          headers:
+            Location:
+              description: URL of the new golden record
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HcpCreateResponse'
+        '200':
+          description: Same Idempotency-Key as an earlier successful request. Returns the original result, nothing new is created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HcpCreateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: A doctor with this NPI or RPPS already exists. The caller must link to the existing record.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+              example:
+                code: IDENTIFIER_EXISTS
+                message: A doctor with this NPI already exists.
+                existingHcpId: HCP000099120
+        '422':
+          description: Business rule failed, for example NPI missing or invalid for a US doctor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                npiRequired:
+                  value:
+                    code: NPI_REQUIRED
+                    message: NPI is required for US doctors.
+                npiInvalid:
+                  value:
+                    code: NPI_INVALID
+                    message: NPI is not valid.
+        '428':
+          description: No valid searchId. A candidate search must be made first.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: SEARCH_REQUIRED
+                message: Search for the doctor first.
+
+  /hcps/{hcpId}:
+    get:
+      tags: [HCP]
+      summary: Get a golden record
+      description: |
+        If the record was merged into another one, the response has status MERGED and survivorHcpId,
+        so that systems holding an old ID can update their link.
+      operationId: getHcp
+      parameters:
+        - name: hcpId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^HCP[0-9]{9}$'
+      responses:
+        '200':
+          description: Golden record found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hcp'
+              examples:
+                active:
+                  value:
+                    hcpId: HCP000184522
+                    status: ACTIVE
+                    firstName: Anna
+                    lastName: Müller
+                    specialtyCode: ONC
+                    countryCode: DE
+                    identifiers:
+                      - type: REFDB
+                        value: DE-55120931
+                        verified: true
+                    affiliations:
+                      - hcoId: HCO000004410
+                        name: Example University Hospital
+                        type: TEACHING_HOSPITAL
+                        startDate: '2019-03-01'
+                    sourceRecords:
+                      - sourceSystem: PHARMACO_CRM
+                        sourceKey: PC-4410029
+                      - sourceSystem: EVENTS
+                        sourceKey: EV-882001
+                    lastUpdated: '2027-04-11T08:02:11Z'
+                merged:
+                  value:
+                    hcpId: HCP000201877
+                    status: MERGED
+                    survivorHcpId: HCP000184522
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: No golden record with this ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: Client credentials per calling system. Scopes limit what each CRM can read (NFR-02).
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.example.com/oauth/token
+          scopes:
+            hcp.read: Read golden records
+            hcp.search: Search candidates
+            hcp.create: Create doctors
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Unique key per create attempt. A retry with the same key returns the first result instead of creating a second doctor.
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: The request is malformed or a mandatory field is missing.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid access token.
+    Forbidden:
+      description: The calling system is not allowed this operation or this country.
+    TooManyRequests:
+      description: Rate limit reached. Retry after the time in the Retry-After header.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+
+  schemas:
+    CountryCode:
+      type: string
+      enum: [US, DE, FR]
+      description: Phase 1 markets only.
+
+    SourceSystem:
+      type: string
+      enum: [PHARMACO_CRM, BIOCO_CRM, EVENTS, SPEND]
+
+    Address:
+      type: object
+      required: [line1, city, postalCode, countryCode]
+      properties:
+        line1:
+          type: string
+          maxLength: 200
+        city:
+          type: string
+          maxLength: 100
+        postalCode:
+          type: string
+          maxLength: 10
+        countryCode:
+          $ref: '#/components/schemas/CountryCode'
+
+    CandidateSearchRequest:
+      type: object
+      required: [lastName, countryCode, sourceSystem]
+      properties:
+        firstName:
+          type: string
+          maxLength: 100
+        lastName:
+          type: string
+          maxLength: 100
+        countryCode:
+          $ref: '#/components/schemas/CountryCode'
+        city:
+          type: string
+        postalCode:
+          type: string
+        specialtyCode:
+          type: string
+        npi:
+          type: string
+          pattern: '^[0-9]{10}$'
+        rpps:
+          type: string
+          pattern: '^[0-9]{11}$'
+        sourceSystem:
+          $ref: '#/components/schemas/SourceSystem'
+
+    Candidate:
+      type: object
+      required: [hcpId, score, matchReasons]
+      properties:
+        hcpId:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        specialtyCode:
+          type: string
+        city:
+          type: string
+        score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Calibrated match score. 1.0 for an exact NPI or RPPS match.
+        matchReasons:
+          type: array
+          description: Attributes that contributed to the score, shown to the rep and to stewards (DEC-09).
+          items:
+            type: string
+            enum: [SAME_NPI, SAME_RPPS, SIMILAR_NAME, SAME_POSTAL_CODE, SAME_ADDRESS, SAME_SPECIALTY, SAME_AFFILIATION]
+        alsoEngagedBy:
+          type: string
+          enum: [PHARMACO_FIELD_FORCE, BIOCO_FIELD_FORCE, BOTH, NONE]
+          description: Supports coordination between field forces (BR-12).
+
+    CandidateSearchResponse:
+      type: object
+      required: [searchId, expiresAt, candidates]
+      properties:
+        searchId:
+          type: string
+          description: Must be sent with a create request (US-02, AC 3).
+        expiresAt:
+          type: string
+          format: date-time
+        candidates:
+          type: array
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/Candidate'
+
+    HcpCreateRequest:
+      type: object
+      required: [searchId, sourceSystem, sourceKey, firstName, lastName, countryCode, specialtyCode, address]
+      properties:
+        searchId:
+          type: string
+        sourceSystem:
+          $ref: '#/components/schemas/SourceSystem'
+        sourceKey:
+          type: string
+          description: The record's ID in the calling CRM.
+        firstName:
+          type: string
+          maxLength: 100
+        lastName:
+          type: string
+          maxLength: 100
+        countryCode:
+          $ref: '#/components/schemas/CountryCode'
+        npi:
+          type: string
+          pattern: '^[0-9]{10}$'
+          description: Mandatory when countryCode is US. Check digit is validated (BR-03).
+        rpps:
+          type: string
+          pattern: '^[0-9]{11}$'
+        specialtyCode:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+
+    HcpCreateResponse:
+      type: object
+      required: [hcpId, status]
+      properties:
+        hcpId:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE]
+        matchingStatus:
+          type: string
+          enum: [PENDING]
+          description: Matching runs asynchronously after creation.
+
+    Identifier:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [NPI, RPPS, REFDB]
+        value:
+          type: string
+        verified:
+          type: boolean
+
+    Affiliation:
+      type: object
+      properties:
+        hcoId:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [HOSPITAL, CLINIC, TEACHING_HOSPITAL, OTHER]
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+
+    Hcp:
+      type: object
+      required: [hcpId, status]
+      properties:
+        hcpId:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, MERGED, INACTIVE]
+        survivorHcpId:
+          type: string
+          description: Present only when status is MERGED.
+        firstName:
+          type: string
+        lastName:
+          type: string
+        specialtyCode:
+          type: string
+        countryCode:
+          $ref: '#/components/schemas/CountryCode'
+        identifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Identifier'
+        affiliations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Affiliation'
+        sourceRecords:
+          type: array
+          items:
+            type: object
+            properties:
+              sourceSystem:
+                $ref: '#/components/schemas/SourceSystem'
+              sourceKey:
+                type: string
+        lastUpdated:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+    ConflictError:
+      allOf:
+        - $ref: '#/components/schemas/Error'
+        - type: object
+          properties:
+            existingHcpId:
+              type: string

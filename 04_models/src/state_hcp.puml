@@ -1,0 +1,27 @@
+@startuml state_hcp
+!include style.iuml
+title State Machine: HCP Golden Record
+
+state Active #E3EEFA {
+  state Current #FFFFFF
+  state "Under review" as UnderReview #FFF4E0
+  [*] --> Current
+  Current --> UnderReview : candidate pair\nsent to steward
+  UnderReview --> Current : steward decided
+}
+state Merged #FBE9E7
+state Inactive #EEF1F5
+
+[*] --> Active : created by rep\nor by load
+Active --> Merged : merged into survivor\n[by rule, model or steward]
+Merged --> Active : unmerge\n[steward]
+Active --> Inactive : doctor retired or\nout of scope
+Inactive --> Active : reactivated
+Merged --> [*] : retention period\nended
+
+note right of Merged
+  Kept with a pointer to the survivor.
+  Systems holding the old ID
+  are redirected.
+end note
+@enduml

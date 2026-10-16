@@ -1,0 +1,94 @@
+' Shared visual style for all PlantUML diagrams in this case.
+' Palette: navy for structure, blue for people and user steps, teal for systems,
+' amber for decisions and rules, red for compliance risk.
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam defaultFontColor #1E2A38
+skinparam BackgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundCorner 12
+skinparam ArrowColor #4A5A70
+skinparam ArrowThickness 1.3
+skinparam ArrowFontColor #4A5A70
+skinparam ArrowFontSize 12
+
+skinparam TitleFontSize 19
+skinparam TitleFontColor #1F3A5F
+skinparam TitleFontStyle bold
+
+skinparam NoteBackgroundColor #FFFBEA
+skinparam NoteBorderColor #D8C27A
+skinparam NoteFontSize 12
+
+skinparam LegendBackgroundColor #F7F9FC
+skinparam LegendBorderColor #C9D3E0
+skinparam LegendFontSize 12
+
+' ---- activity
+skinparam ActivityBackgroundColor #E3EEFA
+skinparam ActivityBorderColor #3B6EA8
+skinparam ActivityBorderThickness 1.2
+skinparam ActivityDiamondBackgroundColor #FFF4E0
+skinparam ActivityDiamondBorderColor #C98A1B
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #1F3A5F
+skinparam ActivityBarColor #1F3A5F
+skinparam SwimlaneTitleFontColor #1F3A5F
+skinparam SwimlaneTitleFontStyle bold
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneBorderColor #B8C4D4
+skinparam SwimlaneBorderThickness 1
+
+' ---- sequence
+skinparam ParticipantBackgroundColor #E2F3F1
+skinparam ParticipantBorderColor #2A7F8E
+skinparam ParticipantFontStyle bold
+skinparam ActorBackgroundColor #E3EEFA
+skinparam ActorBorderColor #3B6EA8
+skinparam DatabaseBackgroundColor #E2F3F1
+skinparam DatabaseBorderColor #2A7F8E
+skinparam SequenceLifeLineBorderColor #9AA8BA
+skinparam SequenceLifeLineBackgroundColor #F2F5FA
+skinparam SequenceGroupBackgroundColor #EEF3F9
+skinparam SequenceGroupBorderColor #9AA8BA
+skinparam SequenceGroupHeaderFontColor #1F3A5F
+skinparam SequenceDividerBackgroundColor #EEF3F9
+skinparam SequenceDividerBorderColor #9AA8BA
+skinparam SequenceDividerFontStyle bold
+skinparam SequenceReferenceBackgroundColor #F7F9FC
+skinparam SequenceMessageAlign center
+
+' ---- class
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassBorderColor #3B6EA8
+skinparam ClassBorderThickness 1.2
+skinparam ClassHeaderBackgroundColor #E3EEFA
+skinparam ClassFontStyle bold
+skinparam ClassAttributeFontSize 12
+skinparam ClassAttributeIconSize 0
+skinparam ClassStereotypeFontColor #4A5A70
+skinparam CircledCharacterFontSize 12
+skinparam CircledCharacterRadius 9
+
+' ---- state
+skinparam StateBackgroundColor #E3EEFA
+skinparam StateBorderColor #3B6EA8
+skinparam StateFontStyle bold
+skinparam StateStartColor #1F3A5F
+skinparam StateEndColor #1F3A5F
+skinparam StateAttributeFontSize 12
+
+' ---- use case
+skinparam UsecaseBackgroundColor #E3EEFA
+skinparam UsecaseBorderColor #3B6EA8
+skinparam UsecaseBorderThickness 1.2
+skinparam ActorStyle awesome
+skinparam RectangleBorderColor #1F3A5F
+skinparam RectangleBorderThickness 1.5
+skinparam RectangleFontColor #1F3A5F
+skinparam RectangleFontStyle bold
+skinparam RectangleBackgroundColor #FBFCFE
+skinparam PackageBorderColor #9AA8BA
+skinparam PackageBackgroundColor #FFFFFF
+skinparam PackageFontColor #1F3A5F

@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="Definitions_Process_AsIs" targetNamespace="http://example.com/bpmn/hcp-case">
+  <bpmn:collaboration id="Collab_Process_AsIs">
+    <bpmn:participant id="Pool_Process_AsIs" name="PharmaCo after the acquisition (AS-IS)" processRef="Process_AsIs" />
+    <bpmn:participant id="Pool_Regulator" name="Regulators (CMS Open Payments, national platforms)" />
+    <bpmn:participant id="Pool_Doctor" name="Doctors" />
+    <bpmn:messageFlow id="M1" name="Disclosure report" sourceRef="T_Upload" targetRef="Pool_Regulator" />
+    <bpmn:messageFlow id="M2" name="Published amounts" sourceRef="Pool_Regulator" targetRef="Pool_Doctor" />
+    <bpmn:messageFlow id="M3" name="Dispute" sourceRef="Pool_Doctor" targetRef="IE_Dispute" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_AsIs" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Process_AsIs">
+      <bpmn:lane id="Lane_Rep" name="Field reps (PharmaCo and BioCo)">
+        <bpmn:flowNodeRef>S_Met</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_SearchOwn</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_Found</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_CreateRec</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_Join1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Log</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>E_Logged</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Tr" name="Transparency team">
+        <bpmn:flowNodeRef>S_Cycle</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Export</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Match</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_Certain</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_Join2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Totals</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_IntRev</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Upload</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>IE_Dispute</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Correct</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>E_Done</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="S_Met" name="Doctor met">
+      <bpmn:outgoing>F1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="T_SearchOwn" name="Search own CRM">
+      <bpmn:incoming>F1</bpmn:incoming>
+      <bpmn:outgoing>F2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_Found" name="Doctor found in own CRM?">
+      <bpmn:incoming>F2</bpmn:incoming>
+      <bpmn:outgoing>F3</bpmn:outgoing>
+      <bpmn:outgoing>F4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_CreateRec" name="Create new doctor record">
+      <bpmn:incoming>F4</bpmn:incoming>
+      <bpmn:outgoing>F5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_Join1">
+      <bpmn:incoming>F3</bpmn:incoming>
+      <bpmn:incoming>F5</bpmn:incoming>
+      <bpmn:outgoing>F6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_Log" name="Log visit or payment">
+      <bpmn:incoming>F6</bpmn:incoming>
+      <bpmn:outgoing>F7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="E_Logged" name="Visit logged">
+      <bpmn:incoming>F7</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataStoreReference id="DS_Src" name="CRMs, events and spend systems" />
+    <bpmn:startEvent id="S_Cycle" name="Annual reporting cycle">
+      <bpmn:outgoing>F10</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="Timer_S_Cycle" />
+    </bpmn:startEvent>
+    <bpmn:task id="T_Export" name="Export payments from 3 systems">
+      <bpmn:incoming>F10</bpmn:incoming>
+      <bpmn:outgoing>F11</bpmn:outgoing>
+      <bpmn:property id="Prop_T_Export" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DIA_T_Export_0"><bpmn:sourceRef>DS_Src</bpmn:sourceRef><bpmn:targetRef>Prop_T_Export</bpmn:targetRef></bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:task id="T_Match" name="Match doctors by surname and city">
+      <bpmn:incoming>F11</bpmn:incoming>
+      <bpmn:outgoing>F12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_Certain" name="Match certain?">
+      <bpmn:incoming>F12</bpmn:incoming>
+      <bpmn:outgoing>F13</bpmn:outgoing>
+      <bpmn:outgoing>F14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_Review" name="Review ~3,000 pairs by hand (no decision log)">
+      <bpmn:incoming>F14</bpmn:incoming>
+      <bpmn:outgoing>F15</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_Join2">
+      <bpmn:incoming>F13</bpmn:incoming>
+      <bpmn:incoming>F15</bpmn:incoming>
+      <bpmn:outgoing>F16</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_Totals" name="Build totals per doctor">
+      <bpmn:incoming>F16</bpmn:incoming>
+      <bpmn:outgoing>F17</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_IntRev" name="Internal review and corrections (~2 weeks)">
+      <bpmn:incoming>F17</bpmn:incoming>
+      <bpmn:outgoing>F18</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sendTask id="T_Upload" name="Upload report to regulator portals">
+      <bpmn:incoming>F18</bpmn:incoming>
+      <bpmn:outgoing>F19</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:intermediateCatchEvent id="IE_Dispute" name="Dispute received">
+      <bpmn:incoming>F19</bpmn:incoming>
+      <bpmn:outgoing>F20</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="Msg_IE_Dispute" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="T_Correct" name="Correct totals in spreadsheet">
+      <bpmn:incoming>F20</bpmn:incoming>
+      <bpmn:outgoing>F21</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="E_Done" name="Cycle closed">
+      <bpmn:incoming>F21</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F1" sourceRef="S_Met" targetRef="T_SearchOwn" />
+    <bpmn:sequenceFlow id="F2" sourceRef="T_SearchOwn" targetRef="G_Found" />
+    <bpmn:sequenceFlow id="F3" name="Yes" sourceRef="G_Found" targetRef="G_Join1" />
+    <bpmn:sequenceFlow id="F4" name="No" sourceRef="G_Found" targetRef="T_CreateRec" />
+    <bpmn:sequenceFlow id="F5" sourceRef="T_CreateRec" targetRef="G_Join1" />
+    <bpmn:sequenceFlow id="F6" sourceRef="G_Join1" targetRef="T_Log" />
+    <bpmn:sequenceFlow id="F7" sourceRef="T_Log" targetRef="E_Logged" />
+    <bpmn:sequenceFlow id="F10" sourceRef="S_Cycle" targetRef="T_Export" />
+    <bpmn:sequenceFlow id="F11" sourceRef="T_Export" targetRef="T_Match" />
+    <bpmn:sequenceFlow id="F12" sourceRef="T_Match" targetRef="G_Certain" />
+    <bpmn:sequenceFlow id="F13" name="Yes" sourceRef="G_Certain" targetRef="G_Join2" />
+    <bpmn:sequenceFlow id="F14" name="No" sourceRef="G_Certain" targetRef="T_Review" />
+    <bpmn:sequenceFlow id="F15" sourceRef="T_Review" targetRef="G_Join2" />
+    <bpmn:sequenceFlow id="F16" sourceRef="G_Join2" targetRef="T_Totals" />
+    <bpmn:sequenceFlow id="F17" sourceRef="T_Totals" targetRef="T_IntRev" />
+    <bpmn:sequenceFlow id="F18" sourceRef="T_IntRev" targetRef="T_Upload" />
+    <bpmn:sequenceFlow id="F19" sourceRef="T_Upload" targetRef="IE_Dispute" />
+    <bpmn:sequenceFlow id="F20" sourceRef="IE_Dispute" targetRef="T_Correct" />
+    <bpmn:sequenceFlow id="F21" sourceRef="T_Correct" targetRef="E_Done" />
+    <bpmn:textAnnotation id="Note_Legend"><bpmn:text>Red: pain points found in discovery (P1 to P5)</bpmn:text></bpmn:textAnnotation>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_Process_AsIs">
+    <bpmndi:BPMNPlane id="Plane_Process_AsIs" bpmnElement="Collab_Process_AsIs">
+      <bpmndi:BPMNShape id="Pool_Process_AsIs_di" bpmnElement="Pool_Process_AsIs" isHorizontal="true"><dc:Bounds x="160" y="80" width="1620" height="440" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Rep_di" bpmnElement="Lane_Rep" isHorizontal="true"><dc:Bounds x="190" y="80" width="1590" height="200" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Tr_di" bpmnElement="Lane_Tr" isHorizontal="true"><dc:Bounds x="190" y="280" width="1590" height="240" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Pool_Regulator_di" bpmnElement="Pool_Regulator" isHorizontal="true"><dc:Bounds x="960" y="580" width="400" height="60" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Pool_Doctor_di" bpmnElement="Pool_Doctor" isHorizontal="true"><dc:Bounds x="1430" y="580" width="350" height="60" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_Met_di" bpmnElement="S_Met" bioc:fill="#FFFFFF" bioc:stroke="#2A7F8E" color:background-color="#FFFFFF" color:border-color="#2A7F8E"><dc:Bounds x="240" y="127" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="228" y="167" width="60" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_SearchOwn_di" bpmnElement="T_SearchOwn" bioc:fill="#E3EEFA" bioc:stroke="#3B6EA8" color:background-color="#E3EEFA" color:border-color="#3B6EA8"><dc:Bounds x="320" y="105" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_Found_di" bpmnElement="G_Found" isMarkerVisible="true" bioc:fill="#FFF4E0" bioc:stroke="#C98A1B" color:background-color="#FFF4E0" color:border-color="#C98A1B"><dc:Bounds x="455" y="120" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="420.0" y="86" width="120" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_CreateRec_di" bpmnElement="T_CreateRec" bioc:fill="#FBE9E7" bioc:stroke="#B5452F" color:background-color="#FBE9E7" color:border-color="#B5452F"><dc:Bounds x="540" y="195" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_Join1_di" bpmnElement="G_Join1" isMarkerVisible="true" bioc:fill="#FFF4E0" bioc:stroke="#C98A1B" color:background-color="#FFF4E0" color:border-color="#C98A1B"><dc:Bounds x="735" y="120" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Log_di" bpmnElement="T_Log" bioc:fill="#E3EEFA" bioc:stroke="#3B6EA8" color:background-color="#E3EEFA" color:border-color="#3B6EA8"><dc:Bounds x="850" y="105" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="E_Logged_di" bpmnElement="E_Logged" bioc:fill="#FFFFFF" bioc:stroke="#B5452F" color:background-color="#FFFFFF" color:border-color="#B5452F"><dc:Bounds x="1012" y="127" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1000" y="167" width="60" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DS_Src_di" bpmnElement="DS_Src" bioc:fill="#EEF1F5" bioc:stroke="#4A5A70" color:background-color="#EEF1F5" color:border-color="#4A5A70"><dc:Bounds x="345" y="213" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="225" y="218" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_Cycle_di" bpmnElement="S_Cycle" bioc:fill="#FFFFFF" bioc:stroke="#2A7F8E" color:background-color="#FFFFFF" color:border-color="#2A7F8E"><dc:Bounds x="240" y="362" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="213" y="402" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Export_di" bpmnElement="T_Export" bioc:fill="#E3EEFA" bioc:stroke="#3B6EA8" color:background-color="#E3EEFA" color:border-color="#3B6EA8"><dc:Bounds x="320" y="340" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Match_di" bpmnElement="T_Match" bioc:fill="#FBE9E7" bioc:stroke="#B5452F" color:background-color="#FBE9E7" color:border-color="#B5452F"><dc:Bounds x="480" y="340" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_Certain_di" bpmnElement="G_Certain" isMarkerVisible="true" bioc:fill="#FFF4E0" bioc:stroke="#C98A1B" color:background-color="#FFF4E0" color:border-color="#C98A1B"><dc:Bounds x="640" y="355" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="620.0" y="321" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Review_di" bpmnElement="T_Review" bioc:fill="#FBE9E7" bioc:stroke="#B5452F" color:background-color="#FBE9E7" color:border-color="#B5452F"><dc:Bounds x="730" y="430" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_Join2_di" bpmnElement="G_Join2" isMarkerVisible="true" bioc:fill="#FFF4E0" bioc:stroke="#C98A1B" color:background-color="#FFF4E0" color:border-color="#C98A1B"><dc:Bounds x="855" y="355" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Totals_di" bpmnElement="T_Totals" bioc:fill="#E3EEFA" bioc:stroke="#3B6EA8" color:background-color="#E3EEFA" color:border-color="#3B6EA8"><dc:Bounds x="950" y="340" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_IntRev_di" bpmnElement="T_IntRev" bioc:fill="#FBE9E7" bioc:stroke="#B5452F" color:background-color="#FBE9E7" color:border-color="#B5452F"><dc:Bounds x="1110" y="340" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Upload_di" bpmnElement="T_Upload" bioc:fill="#E3EEFA" bioc:stroke="#3B6EA8" color:background-color="#E3EEFA" color:border-color="#3B6EA8"><dc:Bounds x="1270" y="340" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IE_Dispute_di" bpmnElement="IE_Dispute" bioc:fill="#FFFFFF" bioc:stroke="#C98A1B" color:background-color="#FFFFFF" color:border-color="#C98A1B"><dc:Bounds x="1430" y="362" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1408" y="330" width="80" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Correct_di" bpmnElement="T_Correct" bioc:fill="#FBE9E7" bioc:stroke="#B5452F" color:background-color="#FBE9E7" color:border-color="#B5452F"><dc:Bounds x="1520" y="340" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="E_Done_di" bpmnElement="E_Done" bioc:fill="#FFFFFF" bioc:stroke="#B5452F" color:background-color="#FFFFFF" color:border-color="#B5452F"><dc:Bounds x="1682" y="362" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1670" y="402" width="60" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F1_di" bpmnElement="F1" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="276" y="145" />
+        <di:waypoint x="320" y="145" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F2_di" bpmnElement="F2" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="420" y="145" />
+        <di:waypoint x="455" y="145" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F3_di" bpmnElement="F3" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="505" y="145" />
+        <di:waypoint x="735" y="145" />
+        <bpmndi:BPMNLabel><dc:Bounds x="600" y="127" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F4_di" bpmnElement="F4" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="480" y="170" />
+        <di:waypoint x="480" y="235" />
+        <di:waypoint x="540" y="235" />
+        <bpmndi:BPMNLabel><dc:Bounds x="486" y="190" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F5_di" bpmnElement="F5" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="640" y="235" />
+        <di:waypoint x="760" y="235" />
+        <di:waypoint x="760" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F6_di" bpmnElement="F6" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="785" y="145" />
+        <di:waypoint x="850" y="145" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F7_di" bpmnElement="F7" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="950" y="145" />
+        <di:waypoint x="1012" y="145" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F10_di" bpmnElement="F10" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="276" y="380" />
+        <di:waypoint x="320" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F11_di" bpmnElement="F11" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="420" y="380" />
+        <di:waypoint x="480" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F12_di" bpmnElement="F12" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="580" y="380" />
+        <di:waypoint x="640" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F13_di" bpmnElement="F13" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="690" y="380" />
+        <di:waypoint x="855" y="380" />
+        <bpmndi:BPMNLabel><dc:Bounds x="750" y="362" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F14_di" bpmnElement="F14" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="665" y="405" />
+        <di:waypoint x="665" y="470" />
+        <di:waypoint x="730" y="470" />
+        <bpmndi:BPMNLabel><dc:Bounds x="671" y="425" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F15_di" bpmnElement="F15" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="830" y="470" />
+        <di:waypoint x="880" y="470" />
+        <di:waypoint x="880" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F16_di" bpmnElement="F16" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="905" y="380" />
+        <di:waypoint x="950" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F17_di" bpmnElement="F17" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="1050" y="380" />
+        <di:waypoint x="1110" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F18_di" bpmnElement="F18" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="1210" y="380" />
+        <di:waypoint x="1270" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F19_di" bpmnElement="F19" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="1370" y="380" />
+        <di:waypoint x="1430" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F20_di" bpmnElement="F20" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="1466" y="380" />
+        <di:waypoint x="1520" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F21_di" bpmnElement="F21" bioc:stroke="#4A5A70" color:border-color="#4A5A70">
+        <di:waypoint x="1620" y="380" />
+        <di:waypoint x="1682" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M1_di" bpmnElement="M1">
+        <di:waypoint x="1320" y="420" />
+        <di:waypoint x="1320" y="580" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1326" y="540" width="90" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M2_di" bpmnElement="M2">
+        <di:waypoint x="1360" y="610" />
+        <di:waypoint x="1430" y="610" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1350" y="625" width="90" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M3_di" bpmnElement="M3">
+        <di:waypoint x="1448" y="580" />
+        <di:waypoint x="1448" y="398" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1454" y="540" width="90" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DIA_T_Export_0_di" bpmnElement="DIA_T_Export_0">
+        <di:waypoint x="370" y="263" />
+        <di:waypoint x="370" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Note_Legend_di" bpmnElement="Note_Legend"><dc:Bounds x="1500" y="450" width="260" height="40" /></bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

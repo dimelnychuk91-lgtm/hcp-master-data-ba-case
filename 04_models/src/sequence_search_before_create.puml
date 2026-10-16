@@ -1,0 +1,58 @@
+@startuml sequence_search_before_create
+!include style.iuml
+autonumber "<b>0."
+title Sequence Diagram: Search Before Create
+
+actor "Field Rep" as Rep
+participant "CRM\n(PharmaCo or BioCo)" as CRM #E3EEFA
+box "MDM Hub" #F2FAF8
+participant "MDM API" as API
+participant "Matching\nService" as MATCH
+database "MDM Store" as MDM
+database "Audit Log" as LOG
+end box
+
+Rep -> CRM : Enter doctor details,\nclick "New doctor"
+CRM -> API : POST /hcp-candidates/search
+activate API
+API -> MATCH : Generate candidates and score
+MATCH -> MDM : Read golden records in block
+MDM --> MATCH : Candidate records
+MATCH --> API : Candidates, scores, reasons
+API --> CRM : 200 OK (searchId, up to 10 candidates)
+deactivate API
+CRM --> Rep : Show candidates, same NPI first
+
+alt #F7F9FC Rep picks a candidate
+  Rep -> CRM : Select candidate
+  CRM -> API : GET /hcps/{hcpId}
+  API --> CRM : 200 OK (golden record)
+  CRM --> Rep : Account linked
+else None of these
+  Rep -> CRM : Fill and save create form
+  CRM -> API : POST /hcps\n(searchId, Idempotency-Key)
+  activate API
+  alt #FBE9E7 No recent search
+    API --> CRM : 428 SEARCH_REQUIRED
+  else US doctor without valid NPI
+    API --> CRM : 422 NPI_REQUIRED / NPI_INVALID
+    CRM --> Rep : Block save, show message
+  else NPI already exists
+    API --> CRM : 409 IDENTIFIER_EXISTS (existing hcpId)
+    CRM --> Rep : Linked to existing doctor
+  else #E2F3F1 Accepted
+    API -> MDM : Create golden record
+    API -> LOG : Log creation
+    API --> CRM : 201 Created (hcpId)
+    CRM --> Rep : Doctor created
+    API ->> MATCH : Match new record (async)
+  end
+  deactivate API
+end
+
+note over CRM, API
+  A retry with the same Idempotency-Key
+  returns the first result: a network timeout
+  never creates a second doctor.
+end note
+@enduml

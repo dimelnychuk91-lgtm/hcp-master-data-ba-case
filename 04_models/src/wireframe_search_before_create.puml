@@ -1,0 +1,29 @@
+@startsalt wireframe_search_before_create
+title Wireframe: CRM, New Doctor (search before create)
+{+
+  {/ <b>Doctors | Accounts | Visits }
+  ==
+  <b>New doctor: search first
+  {
+    Last name   | "Mueller        "
+    First name  | "Anna           "
+    Country     | ^Germany^
+    City        | "Köln           "
+    Specialty   | ^Oncology^
+    NPI (US only) | "               "
+  }
+  [Search]
+  ..
+  <b>Possible matches (3)
+  {#
+    . | <b>Name | <b>City | <b>Specialty | <b>Score | <b>Why it matched | <b>Also engaged by
+    ( ) | Anna Müller | Köln | Oncology | 0.96 | similar name, same postcode, same specialty | BioCo field force
+    ( ) | Anne Mueller | Bonn | Oncology | 0.71 | similar name, same specialty | none
+    ( ) | A. Müller-Hahn | Köln | Cardiology | 0.52 | similar name, same city | none
+  }
+  ..
+  { [Select doctor] | [None of these: create new] | [Cancel] }
+  ..
+  <i>New doctor cannot be saved before a search. US doctors need a valid NPI.
+}
+@endsalt

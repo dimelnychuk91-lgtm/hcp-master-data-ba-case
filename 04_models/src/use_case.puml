@@ -1,0 +1,54 @@
+@startuml use_case
+!include style.iuml
+left to right direction
+title HCP Master Data Hub: Use Case Diagram (phase 1)
+
+actor "Field Rep" as Rep
+actor "Data Engineer" as DE
+actor "Data Governance\nLead" as DGL
+actor "Data Steward" as Steward
+actor "Compliance\nOfficer" as CCO
+actor "Transparency\nAnalyst" as TA
+actor "ML Team" as ML
+actor "NPI Registry" as NPPES <<system>> #E2F3F1
+
+rectangle "HCP Master Data Hub" {
+  usecase "Search for doctor\nbefore create" as UC1
+  usecase "Create new doctor" as UC2
+  usecase "Validate NPI" as UC3 #E2F3F1
+  usecase "Load BioCo records\n(dry run, load, rollback)" as UC4
+  usecase "Approve dry-run result" as UC5
+  usecase "Monitor data quality" as UC6
+  usecase "Review candidate pair" as UC7
+  usecase "Unmerge records" as UC8
+  usecase "Record publication basis" as UC9 #FBE9E7
+  usecase "Set auto-merge threshold" as UC10 #FBE9E7
+  usecase "Review merge history" as UC11 #FBE9E7
+  usecase "Produce disclosure extract" as UC12
+  usecase "Retrain matching model" as UC13
+}
+
+Rep -- UC1
+Rep -- UC2
+DE -- UC4
+DGL -- UC5
+DGL -- UC6
+Steward -- UC7
+Steward -- UC8
+Steward -- UC9
+
+UC10 -- CCO
+UC11 -- CCO
+UC12 -- TA
+UC13 -- ML
+UC3 -- NPPES
+
+UC2 .> UC1 : <<include>>
+UC2 <. UC3 : <<extend>>\n[country = US]
+UC5 .> UC4 : <<extend>>
+
+legend right
+  <color:#B5452F><size:16>■</size></color> compliance-critical
+  <color:#2A7F8E><size:16>■</size></color> system check
+endlegend
+@enduml

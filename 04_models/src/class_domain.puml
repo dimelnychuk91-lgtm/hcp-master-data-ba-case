@@ -1,0 +1,129 @@
+@startuml class_domain
+!include style.iuml
+hide empty methods
+title HCP Master Data: Domain Class Diagram
+
+enum HcpStatus #EEF1F5 {
+  ACTIVE
+  MERGED
+  INACTIVE
+}
+enum IdentifierType #EEF1F5 {
+  NPI
+  RPPS
+  REFDB
+}
+enum Basis #EEF1F5 {
+  CONSENT
+  NO_CONSENT
+  LEGAL_OBLIGATION
+}
+enum PairOutcome #EEF1F5 {
+  MERGED_BY_RULE
+  AUTO_MERGED
+  REVIEW
+  NOT_DUPLICATE
+}
+
+class HCP <<golden record>> #E3EEFA##1F3A5F {
+  hcpId : String
+  status : HcpStatus
+  firstName : String
+  lastName : String
+  specialtyCode : String
+  countryCode : String
+  primaryAddress : Address
+  lastUpdated : DateTime
+}
+
+class SourceRecord {
+  sourceRecordId : String
+  sourceSystem : String
+  sourceKey : String
+  receivedAt : DateTime
+}
+
+class HcpIdentifier {
+  type : IdentifierType
+  value : String
+  verified : Boolean
+}
+
+class HCO {
+  hcoId : String
+  name : String
+  type : String
+}
+
+class Affiliation {
+  startDate : Date
+  endDate : Date [0..1]
+}
+
+class PublicationBasis #FBE9E7 {
+  countryCode : String
+  reportingYear : Integer
+  basis : Basis
+  evidenceRef : String [0..1]
+}
+
+class Payment {
+  paymentId : String
+  amount : Money
+  nature : String
+  reportingCycle : String
+}
+
+class CandidatePair #FFF4E0 {
+  pairId : String
+  ruleApplied : String [0..1]
+  modelScore : Decimal [0..1]
+  modelVersion : String [0..1]
+  outcome : PairOutcome
+}
+
+class StewardDecision #FFF4E0 {
+  decision : String
+  reasonCode : String
+  stewardId : String
+  decidedAt : DateTime
+}
+
+class MergeEvent <<immutable>> #FBE9E7 {
+  eventId : String
+  eventType : String
+  actor : String
+  modelScore : Decimal [0..1]
+  threshold : Decimal [0..1]
+  eventAt : DateTime
+}
+
+HCP "1" *-- "1..*" SourceRecord : described by >
+HCP "1" *-- "0..*" HcpIdentifier : identified by >
+HCP "0..*" -- "0..*" HCO : practises at >
+(HCP, HCO) .. Affiliation
+HCP "1" *-- "0..*" PublicationBasis : has >
+SourceRecord "1" -- "0..*" Payment : receives >
+CandidatePair "0..*" --> "2" SourceRecord : compares >
+CandidatePair "1" -- "0..1" StewardDecision : resolved by >
+MergeEvent "0..*" --> "1" HCP : changes >
+MergeEvent "0..*" --> "1..*" SourceRecord : moves >
+HCP "0..*" --> "0..1" HCP : survivor >
+
+note bottom of Payment
+  Linked to the source record, not to HCP.
+  On unmerge, payments follow their
+  source record automatically (BR-09).
+end note
+
+note right of PublicationBasis
+  One per country and reporting year.
+  On merge, the most restrictive basis wins
+  until a steward confirms.
+end note
+legend right
+  <color:#3B6EA8><size:16>■</size></color> core master data
+  <color:#C98A1B><size:16>■</size></color> matching and review
+  <color:#B5452F><size:16>■</size></color> compliance and audit
+endlegend
+@enduml

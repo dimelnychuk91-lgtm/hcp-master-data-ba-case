@@ -1,0 +1,40 @@
+@startuml state_candidate_pair
+!include style.iuml
+title State Machine: Candidate Pair
+
+state RuleCheck <<choice>>
+state ScoreCheck <<choice>>
+state Generated #EEF1F5
+state Scored #E2F3F1
+state InReview as "In review" #FFF4E0
+state MergedByRule as "Merged by rule" #E2F3F1
+state AutoMerged as "Auto-merged" #E2F3F1
+state MergedBySteward as "Merged by steward" #E3EEFA
+state Reversed #FBE9E7
+state NotDuplicate as "Not a duplicate" #EEF1F5
+
+[*] --> Generated : blocking finds\ntwo similar records
+Generated --> RuleCheck : rules R1 to R4
+RuleCheck --> NotDuplicate : [different NPIs]\nor [different country]
+RuleCheck --> MergedByRule : [same NPI or RPPS]
+RuleCheck --> Scored : [no rule applies]
+Scored --> ScoreCheck : model score
+ScoreCheck --> AutoMerged : [score >= auto-merge\nand no open-cycle payments]
+ScoreCheck --> InReview : [review band]\nor [open-cycle payments]
+ScoreCheck --> NotDuplicate : [score < review]
+InReview --> MergedBySteward : steward:\nsame doctor
+InReview --> NotDuplicate : steward:\ndifferent doctors
+AutoMerged --> Reversed : unmerge
+MergedBySteward --> Reversed : unmerge
+Reversed --> NotDuplicate : stored as\n"different doctors" label
+
+MergedByRule --> [*]
+AutoMerged --> [*]
+MergedBySteward --> [*]
+NotDuplicate --> [*]
+
+note right of InReview
+  Steward decisions become
+  training labels (DEC-08).
+end note
+@enduml

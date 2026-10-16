@@ -1,0 +1,49 @@
+@startuml sequence_bioco_load
+!include style.iuml
+autonumber "<b>0."
+title Sequence Diagram: BioCo Initial Load
+
+actor "Data Engineer" as DE
+actor "Data Governance\nLead" as DGL
+actor "Stewards" as ST
+box "MDM Hub" #F2FAF8
+participant "Load Pipeline" as ETL
+participant "Matching\nService" as MATCH
+database "MDM Store" as MDM
+database "Audit Log" as LOG
+end box
+participant "Transparency\nTeam" as TR #E3EEFA
+
+DE -> ETL : Extract BioCo HCP records
+ETL -> ETL : Standardise names,\naddresses, specialties
+
+== Dry run (no writes) ==
+DE -> ETL : Start dry run
+ETL -> MATCH : Score all candidate pairs
+MATCH --> ETL : Outcome per pair
+ETL --> DGL : Counts per outcome +\nsample of 1,000 auto-merges
+DGL -> ST : Audit the sample
+ST --> DGL : Wrong merges found
+
+alt #FBE9E7 More than 1 wrong in 1,000
+  DGL --> DE : Stop. Review thresholds\nwith ML Team and CCO
+else #E2F3F1 Within tolerance
+  == Real load ==
+  DGL -> DE : Approve real load
+  DE -> ETL : Run real load (loadId)
+  ETL -> MATCH : Apply rules R1 to R8
+  MATCH -> MDM : Merges by rule and auto-merges
+  MATCH -> LOG : Merge events (loadId, score,\nmodel version, threshold)
+  MATCH -> MDM : Review pairs to country queues
+  ETL --> DGL : Load report vs dry run (within 1%)
+  MDM ->> TR : Notify: records with\nopen-cycle payments changed
+  ST -> MDM : Work through review queues
+end
+
+group #FFF4E0 Rollback within 30 days (optional)
+  DGL -> ETL : Roll back loadId
+  ETL -> LOG : Read merge events for loadId
+  ETL -> MDM : Reverse merges,\nmove payments back
+  ETL -> LOG : Log unmerge events
+end
+@enduml

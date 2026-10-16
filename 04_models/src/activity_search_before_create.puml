@@ -1,0 +1,65 @@
+@startuml activity_search_before_create
+!include style.iuml
+title Activity Diagram: Search Before Create
+
+|#F5F8FC|Field Rep|
+start
+:Open "New doctor";
+:Enter surname, first name,\ncity, specialty, NPI if known;
+|#F2FAF8|CRM|
+:Call MDM candidate search; <<#E2F3F1>>
+|#EFF7F5|MDM Hub|
+:Generate and score candidates; <<#E2F3F1>>
+if (Answer within 2 seconds?) then (no)
+  |CRM|
+  :Show "Search unavailable,\ntry again"; <<#FBE9E7>>
+  :Keep creation blocked; <<#FBE9E7>>
+  |Field Rep|
+  stop
+else (yes)
+endif
+|CRM|
+:Show up to 10 candidates,\nsame NPI first; <<#E2F3F1>>
+|Field Rep|
+if (Right doctor in the list?) then (yes)
+  :Select candidate;
+  |CRM|
+  :Link account to\nexisting golden record; <<#E2F3F1>>
+else (none of these)
+  |Field Rep|
+  :Complete create form;
+  |CRM|
+  if (Country = US?) then (yes)
+    if (Valid NPI?) then (no)
+      :Block save:\n"NPI is required" or\n"NPI is not valid"; <<#FBE9E7>>
+      |Field Rep|
+      stop
+    else (yes)
+    endif
+    |MDM Hub|
+    if (NPI already in a golden record?) then (yes)
+      :Return existing record (409); <<#E2F3F1>>
+      |CRM|
+      :Link account to\nexisting golden record; <<#E2F3F1>>
+    else (no)
+      |MDM Hub|
+      :Create golden record; <<#E2F3F1>>
+      :Start background matching\n(rules R1 to R8, async); <<#E2F3F1>>
+    endif
+  else (no)
+    |MDM Hub|
+    :Create golden record; <<#E2F3F1>>
+    :Start background matching\n(rules R1 to R8, async); <<#E2F3F1>>
+  endif
+endif
+|Field Rep|
+:Log visit or payment;
+stop
+
+legend right
+  <color:#3B6EA8><size:16>■</size></color> user step
+  <color:#2A7F8E><size:16>■</size></color> system step
+  <color:#B5452F><size:16>■</size></color> blocked or error
+  <color:#C98A1B><size:16>■</size></color> decision
+endlegend
+@enduml
