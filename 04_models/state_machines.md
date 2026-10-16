@@ -22,7 +22,7 @@
 
 | Transition | Guard | Requirement |
 |---|---|---|
-| Generated → Not duplicate | Different valid NPIs, or different country without a shared identifier | R1, R4 |
+| Generated → Not duplicate | Different valid NPIs or RPPS numbers, or different country without a shared identifier | R1, R4 |
 | Generated → Merged by rule | Same NPI or RPPS | R2, R3 |
 | Scored → Auto-merged | Score ≥ auto-merge threshold **and** no open-cycle payments | R5, BR-07 |
 | Scored → In review | Review band, **or** open-cycle payments | R6, R7 |

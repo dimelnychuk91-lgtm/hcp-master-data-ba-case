@@ -21,25 +21,25 @@
 
 **R** responsible (does it) · **A** accountable (one per row, signs off) · **C** consulted · **I** informed
 
-| Activity | Data Owner | CCO | DGL | Central stewards | Local stewards | ML Team | DPO | IT | Reps |
-|---|---|---|---|---|---|---|---|---|---|
-| Define HCP data standards and code lists | A | C | R | C | C | I | | I | |
-| Approve matching rules R1–R8 | A | C | R | C | C | C | | I | |
-| **Set auto-merge threshold** | C | **A** | R | I | I | C | | I | |
-| Set review threshold | A | C | R | C | C | C | | I | |
-| Create a new doctor | | | I | | | | | | R, A |
-| Review candidate pairs | | | A | R | R | I | | | |
-| Unmerge a wrong merge | | I | A | R | R | I | | | |
-| Override a golden record value by hand | | | A | R | R | | | | |
-| Record consent or legal basis | | A | I | R | R | | | | |
-| Approve use of data for model training | C | C | C | | | R | **A** | I | |
-| Retrain and release a model version | I | C | A | | | R | C | C | |
-| Run monthly sampled audit of auto-merges | I | I | A | R | R | C | | | |
-| Pause automatic merging after a failed audit | I | C | A, R | I | I | C | | R | |
-| Run and monitor integrations | | | I | | | | | A, R | |
-| Produce disclosure extract | | A | C | C | | | | I | |
+| Activity | Data Owner | CCO | DGL | Central stewards | Local stewards | ML Team | DPO | Transparency | IT | Reps |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Define HCP data standards and code lists | A | C | R | C | C | I | | | I | |
+| Approve matching rules R1–R8 | A | C | R | C | C | C | | C | I | |
+| **Set auto-merge threshold** | C | **A** | R | I | I | C | | I | I | |
+| Set review threshold | A | C | R | C | C | C | | | I | |
+| Create a new doctor | | | I | | | | | | | R, A |
+| Review candidate pairs | | | A | R | R | I | | | | |
+| Unmerge a wrong merge | | I | A | R | R | I | | I | | |
+| Override a golden record value by hand | | | A | R | R | | | | | |
+| Record consent or legal basis | | A | I | R | R | | | C | | |
+| Approve use of data for model training | C | C | C | | | R | **A** | | I | |
+| Retrain and release a model version | I | C | A | | | R | C | | C | |
+| Run monthly sampled audit of auto-merges | I | I | A | R | R | C | | | | |
+| Pause automatic merging after a failed audit | I | C | A, R | I | I | C | | I | R | |
+| Run and monitor integrations | | | I | | | | | | A, R | |
+| Produce disclosure extract | | A | C | C | | | | R | I | |
 
-*CCO keeps accountability for the extract because it is a compliance output; production is done by the Transparency team.*
+*Transparency = Transparency team. The CCO is accountable for the extract because it is a compliance output; the Transparency team produces it.*
 
 ## 3. Change control for rules and thresholds
 

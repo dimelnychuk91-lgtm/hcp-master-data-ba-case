@@ -18,6 +18,13 @@ enum Basis #EEF1F5 {
   NO_CONSENT
   LEGAL_OBLIGATION
 }
+enum RuleApplied #EEF1F5 {
+  NPI_EXACT
+  RPPS_EXACT
+  ID_CONFLICT
+  COUNTRY_MISMATCH
+  NONE
+}
 enum PairOutcome #EEF1F5 {
   MERGED_BY_RULE
   AUTO_MERGED
@@ -76,7 +83,7 @@ class Payment {
 
 class CandidatePair #FFF4E0 {
   pairId : String
-  ruleApplied : String [0..1]
+  ruleApplied : RuleApplied
   modelScore : Decimal [0..1]
   modelVersion : String [0..1]
   outcome : PairOutcome

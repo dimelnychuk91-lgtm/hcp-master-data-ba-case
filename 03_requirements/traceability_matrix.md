@@ -22,7 +22,7 @@
 | BR-04 | Search before create | S1, S7 | DEC-05 | US-01, US-02 | Activity diagram, [sequence 1](../04_models/sequence_diagrams.md), API search, 428 | US-01 AC 1–4, US-02 AC 1–3 |
 | BR-05 | BioCo one-off load with dry run and rollback | S4, S5 | DEC-05 | US-04 | Sequence 2, [matching rules](../04_models/matching_rules.md) §3 | US-04 AC 1–4 |
 | BR-06 | Rules for NPI, model for the rest, three outcomes | S5, S9 | DEC-06 | US-05 | Matching rules §1, [ML requirements](ml_requirements.md) §2 | US-05 AC 1–6, ML-AC-01–03 |
-| BR-07 | Auto-merge ≤ 0.1% wrong; open-cycle payments to steward | S2 | DEC-07 | US-05 | Matching rules R5–R6, ML requirements §5 | US-05 AC 4, ML-AC-01, BRD §11 audit |
+| BR-07 | Auto-merge ≤ 0.1% wrong; model-scored pairs with open-cycle payments to steward | S2 | DEC-07 | US-05 | Matching rules R5–R6, ML requirements §5 | US-05 AC 4, ML-AC-01, BRD §11 audit |
 | BR-08 | Steward queue with reasons | S8 | DEC-09 | US-07, US-09 | Data model (candidate pair, decision), ML requirements §6 | US-07 AC 1–4, ML-AC-05 |
 | BR-09 | Unmerge with payment reassignment | S2 | DEC-10 | US-08 | Matching rules §5, data model §4 | US-08 AC 1–3 |
 | BR-10 | Consent or legal basis per country and year | S2, S10 | DEC-10 | US-11 | [Data dictionary](../04_models/data_dictionary.md) publication basis, matching rules §4 | US-11 AC 1–4 |

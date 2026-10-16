@@ -16,9 +16,6 @@ servers:
   - url: https://mdm.example.com/api/v1
     description: Example only
 
-security:
-  - oauth2: []
-
 tags:
   - name: Search
   - name: HCP
@@ -33,6 +30,8 @@ paths:
         Returns up to 10 candidates ranked by score, an exact NPI match always first.
         Target response time: 2 seconds for 95% of calls (NFR-04).
       operationId: searchCandidates
+      security:
+        - oauth2: [hcp.search]
       requestBody:
         required: true
         content:
@@ -81,6 +80,8 @@ paths:
         Requires the searchId of a search made in the last 30 minutes for the same details.
         After creation the record is matched asynchronously (rules R1 to R8).
       operationId: createHcp
+      security:
+        - oauth2: [hcp.create]
       parameters:
         - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
@@ -170,6 +171,8 @@ paths:
         If the record was merged into another one, the response has status MERGED and survivorHcpId,
         so that systems holding an old ID can update their link.
       operationId: getHcp
+      security:
+        - oauth2: [hcp.read]
       parameters:
         - name: hcpId
           in: path

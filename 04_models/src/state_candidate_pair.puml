@@ -15,7 +15,7 @@ state NotDuplicate as "Not a duplicate" #EEF1F5
 
 [*] --> Generated : blocking finds\ntwo similar records
 Generated --> RuleCheck : rules R1 to R4
-RuleCheck --> NotDuplicate : [different NPIs]\nor [different country]
+RuleCheck --> NotDuplicate : [different NPIs or RPPS]\nor [different country]
 RuleCheck --> MergedByRule : [same NPI or RPPS]
 RuleCheck --> Scored : [no rule applies]
 Scored --> ScoreCheck : model score

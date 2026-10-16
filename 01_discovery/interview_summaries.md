@@ -6,7 +6,7 @@
 
 ## How to read this document
 
-Each summary has the same structure: **what we heard**, **new facts**, **what it changes** (link to framing decisions D1–D17 in the case brief), **open questions**.
+Each summary has the same structure: **what we heard**, **new facts**, **what it changes** (link to the [business case](../02_strategy/business_case.md) and to decisions DEC-01 to DEC-12 in the [decision log](../02_strategy/decision_log.md)), **open questions**.
 Stakeholder IDs (S1–S10) refer to the [stakeholder map](stakeholder_map.md).
 
 ---
@@ -26,8 +26,8 @@ Stakeholder IDs (S1–S10) refer to the [stakeholder map](stakeholder_map.md).
 - Implementation budget is approved in the next budget cycle; discovery must deliver a cost range, not a fixed price.
 
 **What it changes**
-- Confirms D1: budget comes from commercial, risk sits with compliance.
-- C1 shapes the phasing in the business case (D10): US field changes cannot start before Q2.
+- Confirms the sponsor model: budget comes from commercial, risk sits with compliance.
+- C1 shapes the phasing in the business case (section 8, DEC-12): US field changes cannot start before Q2.
 - His preference for CRM consolidation (option 2) must be addressed openly in the options workshop, not avoided.
 
 **Open questions**
@@ -49,12 +49,12 @@ Stakeholder IDs (S1–S10) refer to the [stakeholder map](stakeholder_map.md).
 - She expects every merge that affects a reported payment to be traceable: who merged, when, on what basis.
 
 **What it changes**
-- Confirms the precision priority for auto-merge in D17, now with a concrete incident behind it.
-- Confirms the audit trail and unmerge requirements in D14.
-- Her answer to "what must never be automated without manual validation": merges of records that already carry reported payments in an open reporting cycle. Candidate rule for the requirements.
+- Confirms the precision priority for auto-merge (DEC-07), now with a concrete incident behind it.
+- Confirms the audit trail and unmerge requirements (DEC-10).
+- Her answer to "what must never be automated without manual validation": merges of records that already carry reported payments in an open reporting cycle. Agreed later as: model-scored pairs touching open-cycle payments always go to a steward; merges by an exact national identifier proceed automatically and notify the Transparency team (DEC-07).
 
 **Open questions**
-- What error rate would she accept for auto-merge? Needs a number before thresholds can be proposed (D17).
+- What error rate would she accept for auto-merge? Needs a number before thresholds can be proposed (DEC-07).
 
 ---
 
@@ -71,7 +71,7 @@ Stakeholder IDs (S1–S10) refer to the [stakeholder map](stakeholder_map.md).
 - The NPI rule is a working control we can reuse, not just a data attribute.
 
 **What it changes**
-- Confirms D8: his position is partly right. The NPI rule becomes a requirement for US records in the master, and BioCo NPI becomes the US reference key.
+- Leads to DEC-03: his position is partly right. The NPI rule becomes a requirement for US records in the master, and BioCo NPI becomes the US reference key.
 - Together with C1 from S1 there is a shared interest: neither wants US field disruption in Q1. A common ground for the joint workshop.
 
 **Open questions**
@@ -89,7 +89,7 @@ Stakeholder IDs (S1–S10) refer to the [stakeholder map](stakeholder_map.md).
 - The whole cycle takes about six weeks; the last two are spent on corrections after internal review.
 
 **What it changes**
-- Confirms D6 and the weak-label problem in D17: there is no history of why records were matched.
+- Confirms the AS-IS process and the weak-label problem (DEC-08): there is no history of why records were matched.
 - The 3,000 pairs per cycle give a first estimate of the steward review load.
 
 ---

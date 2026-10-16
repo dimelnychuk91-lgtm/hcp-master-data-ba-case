@@ -14,7 +14,7 @@
 | [DEC-04](#dec-04-data-ownership-model) | Data ownership model with Data Owner, stewards, Compliance veto | Agreed | Steering Committee | 4 |
 | [DEC-05](#dec-05-matching-in-two-modes) | Matching in two modes: initial load and steady state | Agreed | Data Governance Lead, Enterprise Architect | 4 |
 | [DEC-06](#dec-06-hybrid-matching-rules-plus-ml) | Hybrid matching: rules for exact NPI, ML model for the rest | Agreed | Enterprise Architect, ML Team, CCO | 4 |
-| [DEC-07](#dec-07-auto-merge-tolerance) | Auto-merge tolerance 0.1%; open-cycle payments always to a steward | **Pending written confirmation** | CCO | 5 |
+| [DEC-07](#dec-07-auto-merge-tolerance) | Auto-merge tolerance 0.1%; model-scored pairs with open-cycle payments always to a steward | **Pending written confirmation** | CCO | 5 |
 | [DEC-08](#dec-08-training-labels) | Training labels from a steward sample; past files as weak labels only | Agreed | ML Team, Data Governance Lead | 4 |
 | [DEC-09](#dec-09-no-llm-explanations-in-phase-1) | Merge explanations from model features; LLM explanations rejected for phase 1 | Agreed | CCO, ML Team | 5 |
 | [DEC-10](#dec-10-mandatory-non-functional-requirements) | Mandatory non-functional requirements for audit and privacy | Agreed | CCO, DPO | 5 |
@@ -110,11 +110,12 @@
 
 **Context.** In the last cycle two different doctors with the same name were merged and a payment was reported against the wrong person (F1). For Compliance a false merge is worse than a missed duplicate.
 
-**Decision.** At most 1 false merge per 1,000 automatic merges (0.1%). Any merge touching a record with reported payments in an open reporting cycle goes to a steward, whatever the model score.
+**Decision.** At most 1 false merge per 1,000 automatic merges by the model (0.1%). A model-scored pair that touches a record with reported payments in an open reporting cycle goes to a steward, whatever the score. Merges by an exact national identifier (same NPI or RPPS) still proceed automatically, because the identifier is certain, and the Transparency team is notified so the report in progress reflects the change.
 
 **Alternatives rejected.**
 - *No automatic merges:* steward workload would not fit the team size.
 - *Looser tolerance (1%):* about 10 wrong-person merges per 1,000, not acceptable after the incident.
+- *Send every open-cycle merge to a steward, including exact NPI matches:* adds review work for merges that are certain, and delays the report without reducing risk.
 
 **Trade-off made explicit:** a stricter threshold means more pairs in the review band and more steward hours. The band will be sized to steward capacity.
 

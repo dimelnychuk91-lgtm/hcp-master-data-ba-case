@@ -12,8 +12,8 @@ Legend: **M** mandatory, **C** conditional, **O** optional.
 | Attribute | Definition | Type | M/C/O | Sources | Survivorship | Owner | Quality rule |
 |---|---|---|---|---|---|---|---|
 | hcp_id | Unique ID of the doctor in the master. Never reused | string(12) | M | MDM | generated | Data Governance Lead | Unique, immutable |
-| status | `active`, `merged`, `inactive` | enum | M | MDM | n/a | Data Governance Lead | `merged` requires survivor_hcp_id |
-| survivor_hcp_id | Golden record this one was merged into | string(12) | C | MDM | n/a | Data Governance Lead | Set only when status = `merged`; points to an `active` record |
+| status | `ACTIVE`, `MERGED`, `INACTIVE` | enum | M | MDM | n/a | Data Governance Lead | `MERGED` requires survivor_hcp_id |
+| survivor_hcp_id | Golden record this one was merged into | string(12) | C | MDM | n/a | Data Governance Lead | Set only when status = `MERGED`; points to an `ACTIVE` record |
 | first_name | Given name, without titles | string(100) | M | all | Reference database, then most recent CRM value | Country steward | No titles ("Dr.", "Prof."); diacritics kept |
 | last_name | Family name, without titles | string(100) | M | all | Reference database, then most recent CRM value | Country steward | As first_name |
 | specialty_code | Main specialty, from the single PharmaCo code list | string(10) | M | all, mapped | Reference database, then CRM | Data Governance Lead | Value exists in the code list |
@@ -49,7 +49,7 @@ Legend: **M** mandatory, **C** conditional, **O** optional.
 |---|---|---|---|---|---|---|---|
 | hco_id | ID of the organisation | string(12) | M | MDM | generated | Data Governance Lead | Unique |
 | name | Standardised organisation name | string(200) | M | CRMs, reference DB | Reference database | Country steward | Standardised form |
-| type | `hospital`, `clinic`, `teaching hospital`, `other` | enum | M | reference DB | Reference database | Data Governance Lead | Teaching hospital flag required for US reporting |
+| type | `HOSPITAL`, `CLINIC`, `TEACHING_HOSPITAL`, `OTHER` | enum | M | reference DB | Reference database | Data Governance Lead | Teaching hospital flag required for US reporting |
 | affiliation.start_date | Date the doctor started practising at the organisation | date | M | CRMs, reference DB | Earliest verified | Country steward | Not in the future |
 | affiliation.end_date | Date the doctor stopped practising there | date | O | CRMs, reference DB | Most recent verified | Country steward | After start_date |
 
@@ -59,9 +59,9 @@ Legend: **M** mandatory, **C** conditional, **O** optional.
 |---|---|---|---|---|---|---|---|
 | country_code | Country whose disclosure rules apply | string(2) | M | consent system | n/a | Chief Compliance Officer | Phase 1 country |
 | reporting_year | Year of the disclosure report | int | M | consent system | n/a | Chief Compliance Officer | Current or past year |
-| basis | `consent`, `no consent`, `legal obligation` | enum | M | consent system, rules | **Most restrictive wins** on merge until a steward confirms | Chief Compliance Officer | `legal obligation` only where the law requires disclosure (France) |
+| basis | `CONSENT`, `NO_CONSENT`, `LEGAL_OBLIGATION` | enum | M | consent system, rules | **Most restrictive wins** on merge until a steward confirms | Chief Compliance Officer | `LEGAL_OBLIGATION` only where the law requires disclosure (France) |
 | recorded_on | Date the basis was recorded | date | M | consent system | n/a | Chief Compliance Officer | Not in the future |
-| evidence_ref | Reference to the signed consent or the legal basis | string(50) | C | consent system | n/a | Chief Compliance Officer | Required when basis = `consent` |
+| evidence_ref | Reference to the signed consent or the legal basis | string(50) | C | consent system | n/a | Chief Compliance Officer | Required when basis = `CONSENT` |
 
 ## PAYMENT
 
@@ -79,11 +79,12 @@ Held in spend and event systems; listed here because the master must link to it.
 
 | Attribute | Definition | Type | M/C/O | Owner | Quality rule |
 |---|---|---|---|---|---|
-| candidate_pair.rule_applied | `NPI_EXACT`, `NPI_CONFLICT` or none | enum | M | Data Governance Lead | Set before scoring |
+| candidate_pair.rule_applied | `NPI_EXACT`, `RPPS_EXACT`, `ID_CONFLICT` (rule R1), `COUNTRY_MISMATCH` (rule R4), `NONE` | enum | M | Data Governance Lead | Set before scoring |
 | candidate_pair.model_score | Calibrated score, 0 to 1 | decimal(4,3) | C | ML Team | Present when no rule applied |
 | candidate_pair.model_version | Version of the model that scored the pair | string | C | ML Team | Registered version |
-| candidate_pair.outcome | `auto merged`, `review`, `not duplicate`, `merged by rule` | enum | M | Data Governance Lead | Consistent with thresholds in force |
-| steward_decision.reason_code | Reason from a fixed list, e.g. `same NPI`, `same address and name`, `different specialty`, `different person confirmed` | enum | M | Data Governance Lead | From the list |
-| merge_event.actor | `rule`, `model` or steward ID | string | M | Data Governance Lead | Never empty |
-| merge_event.threshold | Auto-merge threshold in force at the time | decimal(4,3) | C | Chief Compliance Officer | Present when actor = `model` |
+| candidate_pair.outcome | `MERGED_BY_RULE`, `AUTO_MERGED`, `REVIEW`, `NOT_DUPLICATE` | enum | M | Data Governance Lead | Consistent with rules and thresholds in force. Steward results are stored in steward_decision |
+| steward_decision.decision | `SAME_DOCTOR` or `DIFFERENT_DOCTORS` | enum | M | Data Governance Lead | Mandatory with a reason code |
+| steward_decision.reason_code | Reason from a fixed list, e.g. `SAME_NPI`, `SAME_ADDRESS_AND_NAME`, `DIFFERENT_SPECIALTY`, `DIFFERENT_PERSON_CONFIRMED` | enum | M | Data Governance Lead | From the list |
+| merge_event.actor | `RULE`, `MODEL` or steward ID | string | M | Data Governance Lead | Never empty |
+| merge_event.threshold | Auto-merge threshold in force at the time | decimal(4,3) | C | Chief Compliance Officer | Present when actor = `MODEL` |
 | merge_event (all) | Immutable once written | n/a | n/a | Chief Compliance Officer | No update or delete (NFR-01) |

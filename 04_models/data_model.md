@@ -56,7 +56,7 @@ erDiagram
 
     HCP {
         string hcp_id PK
-        string status "active, merged, inactive"
+        string status "ACTIVE, MERGED, INACTIVE"
         string survivor_hcp_id FK "set when merged"
         string first_name
         string last_name
@@ -86,7 +86,7 @@ erDiagram
     HCO {
         string hco_id PK
         string name
-        string type "hospital, clinic, teaching hospital"
+        string type "HOSPITAL, CLINIC, TEACHING_HOSPITAL, OTHER"
         string country_code
     }
     AFFILIATION {
@@ -99,7 +99,7 @@ erDiagram
         string hcp_id FK
         string country_code
         int reporting_year
-        string basis "consent, no consent, legal obligation"
+        string basis "CONSENT, NO_CONSENT, LEGAL_OBLIGATION"
         date recorded_on
         string evidence_ref
     }
@@ -116,15 +116,15 @@ erDiagram
         string pair_id PK
         string record_a_id FK
         string record_b_id FK
-        string rule_applied "NPI_EXACT or none"
+        string rule_applied "NPI_EXACT, RPPS_EXACT, ID_CONFLICT, COUNTRY_MISMATCH, NONE"
         decimal model_score
         string model_version
-        string outcome "auto merged, review, not duplicate"
+        string outcome "MERGED_BY_RULE, AUTO_MERGED, REVIEW, NOT_DUPLICATE"
         datetime created_at
     }
     STEWARD_DECISION {
         string pair_id FK
-        string decision "same doctor, different doctors"
+        string decision "SAME_DOCTOR, DIFFERENT_DOCTORS"
         string reason_code
         string comment
         string steward_id
@@ -132,7 +132,7 @@ erDiagram
     }
     MERGE_EVENT {
         string event_id PK
-        string event_type "merge, unmerge"
+        string event_type "MERGE, UNMERGE"
         string hcp_id FK
         string actor "rule, model, steward id"
         decimal model_score

@@ -69,7 +69,7 @@ Priority: **M** must, **S** should, **C** could (MoSCoW, agreed with S1 and S2).
 | BR-04 | Before a new doctor is created in either CRM, the user shall be shown existing records that may describe the same doctor | M | G2, G3 | S1, S7 | DEC-05 |
 | BR-05 | BioCo doctor records shall be loaded and matched once, with a dry run, sampled manual review and the ability to roll back the load | M | G2 | S4, S5 | DEC-05 |
 | BR-06 | Records with the same NPI shall be merged by rule. All other candidate pairs shall be scored and routed to one of three outcomes: merge automatically, review by a steward, not a duplicate | M | G1, G2 | S5, S9 | DEC-06 |
-| BR-07 | Automatic merges shall produce at most 1 wrong merge per 1,000. Any merge that touches a record with payments in an open reporting cycle shall go to a steward | M | G1 | S2 | DEC-07 |
+| BR-07 | Automatic merges by the model shall produce at most 1 wrong merge per 1,000. A model-scored pair that touches a record with payments in an open reporting cycle shall go to a steward. Merges by an exact national identifier (NPI, RPPS) proceed automatically and notify the Transparency team | M | G1 | S2 | DEC-07 |
 | BR-08 | Stewards shall review candidate pairs in a queue that shows why the pair was proposed, and record a decision with a reason | M | G1, G2 | S8 | DEC-09 |
 | BR-09 | A steward shall be able to undo a wrong merge, and payments linked to the merged record shall be reassigned to the correct doctor | M | G1 | S2 | DEC-10 |
 | BR-10 | The golden record shall carry each doctor's consent status for individual publication per country and reporting year. Where disclosure is a legal obligation (France), the legal basis shall be recorded instead of consent | M | G1 | S2, S10 | DEC-10 |

@@ -78,7 +78,7 @@ Scores: 1 = poor, 5 = strong.
 
 - **Option 1** is fast and cheap, and makes the next report safer. But duplicates keep being created every day; the tool only cleans them once a year.
 - **Option 2** gives one CRM, which the sponsor values. But a CRM without matching rules and ownership creates new duplicates within a year. Migrating US reps in the launch year is the most disruptive path, and it throws away BioCo's working NPI control.
-- **Option 3** addresses all three root cause layers: a shared key (golden record with NPI as US reference), search before create at entry, and a named owner with stewards. Phase 0 brings option 1's early value, so time to first value is the same as option 2. It is the most expensive, and the Enterprise Architect is cautious about adding a platform.
+- **Option 3** addresses all three root cause layers: a shared key (golden record with NPI as US reference), search before create at entry, and a named owner with stewards. Phase 0 brings part of option 1's early value, but the hub itself takes longer to deliver, so time to first value scores 3, not 5. It is the most expensive, and the Enterprise Architect is cautious about adding a platform.
 
 ## 6. Sensitivity: when would we recommend something else?
 
@@ -113,7 +113,7 @@ Estimates are ranges, not quotes. Vendor selection is a separate step after appr
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Wrong auto-merges | Payment reported on the wrong doctor | Auto-merge tolerance of 0.1%; merges touching payments in an open cycle always go to a steward; unmerge and audit trail |
+| Wrong auto-merges | Payment reported on the wrong doctor | Auto-merge tolerance of 0.1%; model-suggested merges touching payments in an open cycle always go to a steward; unmerge and audit trail |
 | Weak training labels for the matching model | Model quality below target | Steward labelling in phase 0; past reconciliation files used only as weak labels |
 | BioCo field resistance | Low adoption in the US | BioCo NPI rule kept and made a master data rule; US changes start after the launch |
 | Steward capacity | Review queue grows | Size the review band to steward hours; monitor queue weekly |

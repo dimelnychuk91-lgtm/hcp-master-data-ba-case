@@ -77,8 +77,8 @@ Two thresholds split pairs into three bands:
 | Score < review threshold | Not a duplicate | Data Governance Lead |
 
 **Override rules that the model cannot bypass** (see [matching rules](../04_models/matching_rules.md)):
-- different valid NPIs: never merge;
-- payments in an open reporting cycle: always to a steward (BR-07).
+- different valid NPIs or different valid RPPS: never merge;
+- payments in an open reporting cycle: a model-scored pair always goes to a steward (BR-07).
 
 ### 5.1 Model metrics in business terms
 

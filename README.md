@@ -25,7 +25,7 @@ The same doctor now appears as several records. That matters because pharma comp
 - **Root cause first.** Duplicates come from three layers: no shared identifier, manual entry in the field, nobody owning the data. The recommendation addresses all three; cheaper options address one.
 - **Four options compared on agreed weights**, including "do nothing". The MDM hub scored 3.95 / 5, the tactical fix 3.30, CRM consolidation 2.65. The sensitivity analysis shows when the cheaper option would be the right call.
 - **Hybrid matching.** An exact NPI match merges by rule. An ML model scores the fuzzy cases into three bands: auto-merge, steward review, not a duplicate. Thresholds are set by Compliance, not by the ML team.
-- **A false merge is worse than a missed one.** Auto-merge tolerance is 1 wrong per 1,000, and any record with payments in an open reporting cycle always goes to a person.
+- **A false merge is worse than a missed one.** Auto-merge tolerance is 1 wrong per 1,000, and a model-suggested merge that touches payments in an open reporting cycle always goes to a person.
 - **The resisting stakeholder was partly right.** BioCo's rule "no NPI, no record" became a master data rule for the US.
 - **A launch freeze became part of the plan.** No US field changes in Q1, so Q1 delivers everything else.
 
@@ -33,9 +33,10 @@ The same doctor now appears as several records. That matters because pharma comp
 
 | Area | Document | What it shows |
 |---|---|---|
-| **Discovery** | [Stakeholder map](01_discovery/stakeholder_map.md) | 10 stakeholders, power and interest, four tensions and how each is handled |
+| **Discovery** | [BA plan](01_discovery/ba_plan.md) | Six-week plan: approach, activities and techniques by week, deliverables, communication, requirements management, risks |
+| | [Stakeholder map](01_discovery/stakeholder_map.md) | 10 stakeholders, power and interest, four tensions and how each is handled |
 | | [Interview guide: sponsor](01_discovery/interview_guide_S1.md) | Elicitation plan for a senior stakeholder |
-| | [Interview summaries](01_discovery/interview_summaries.md) | What each stakeholder said, what it changed, six cross-interview findings |
+| | [Interview summaries](01_discovery/interview_summaries.md) | Three key senior interviews and one observation session: what was said, what it changed, six cross-interview findings |
 | **Strategy** | [Business case](02_strategy/business_case.md) | Problem cost, goals with baselines, four options, weighted matrix, sensitivity, roadmap, risks |
 | | [Decision log](02_strategy/decision_log.md) | 12 decisions with context, rejected alternatives and who decided |
 | **Requirements** | [BRD](03_requirements/BRD.md) | Scope, 16 business and 6 non-functional requirements, constraints, acceptance |

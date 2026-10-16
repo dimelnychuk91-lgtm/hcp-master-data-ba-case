@@ -11,7 +11,7 @@ Rules are evaluated **in this order**. The first rule that applies decides the o
 
 | Step | Rule | Outcome | Why first |
 |---|---|---|---|
-| R1 | Both records have valid NPIs and they **differ** | **Never merge** | Two NPIs means two people. No score can override this |
+| R1 | Both records have valid NPIs that **differ**, or valid RPPS numbers that **differ** | **Never merge** | Two national identifiers means two people. No score can override this |
 | R2 | Both records have the same valid NPI | **Merge by rule** | Exact national identifier |
 | R3 | Both records have the same RPPS (France) | **Merge by rule** | Exact national identifier |
 | R4 | Different country of practice and no shared identifier | **Not a duplicate** in phase 1 | Cross-border doctors are rare; handled manually on request |
@@ -26,8 +26,9 @@ flowchart TD
     A["Candidate pair"] --> B{"Both have valid NPI?"}
     B -- "yes, different" --> NM["Never merge (R1)"]
     B -- "yes, same" --> MR["Merge by rule (R2)"]
-    B -- "no" --> C{"Same RPPS?"}
-    C -- "yes" --> MR3["Merge by rule (R3)"]
+    B -- "no" --> C{"Both have valid RPPS?"}
+    C -- "yes, different" --> NM
+    C -- "yes, same" --> MR3["Merge by rule (R3)"]
     C -- "no" --> D{"Same country?"}
     D -- "no" --> ND1["Not a duplicate (R4)"]
     D -- "yes" --> S["Model score"]
@@ -48,7 +49,7 @@ flowchart TD
     class ND1,ND2 none
 ```
 
-**Note on R2 and R6.** A merge by NPI rule also touches records that may have open-cycle payments. It still proceeds automatically, because the NPI is certain, but the Transparency team is notified so that the report in progress reflects it.
+**Note on R2, R3 and R6.** A merge by an exact national identifier also touches records that may have open-cycle payments. It still proceeds automatically, because the identifier is certain, but the Transparency team is notified so that the report in progress reflects it.
 
 ## 2. Thresholds
 

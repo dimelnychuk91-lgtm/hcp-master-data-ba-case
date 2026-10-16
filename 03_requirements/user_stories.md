@@ -83,7 +83,7 @@ Traces to: BR-06, BR-07 · Priority: M · Release: 1a
 **Acceptance criteria**
 
 1. **Given** two records with the same valid NPI, **when** matching runs, **then** they are merged by rule without a model score.
-2. **Given** two records with different valid NPIs, **when** matching runs, **then** they are never merged, whatever the model score.
+2. **Given** two records with different valid NPIs, or different valid RPPS numbers, **when** matching runs, **then** they are never merged, whatever the model score.
 3. **Given** a pair without a shared NPI, **when** the model score is at or above the auto-merge threshold, **then** the pair is merged automatically.
 4. **Given** a pair that would be merged automatically, **when** either record has payments in an open reporting cycle, **then** the pair goes to steward review instead.
 5. **Given** a pair with a score between the review and auto-merge thresholds, **when** matching runs, **then** the pair is added to the steward queue of the doctor's country.
